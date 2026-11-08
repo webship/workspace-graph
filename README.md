@@ -1,4 +1,4 @@
-# @webship/workspace-graph
+# @webship.co/workspace-graph
 
 The **Graphs** workspace of the [Webship Workspace](https://github.com/webship/workspace) dashboard:
 the `graphs/` folder (type `code`), its settings file (`core/config/workspace.graphs.settings.yml`),
