@@ -1,8 +1,8 @@
 # @webship.co/workspace-graph
 
-The **Graphs** workspace of the [Webship Workspace](https://github.com/webship/workspace) dashboard:
+The **Graphs** workspace and the knowledge-graph feature of the [Webship Workspace](https://github.com/webship/workspace) dashboard:
 the `graphs/` folder (type `code`), its settings file (`core/config/workspace.graphs.settings.yml`),
-its commands and its docs, as a plugin.
+its commands and its docs, as a plugin — plus the **Graph** menu on every project row that has a graphify command (build with graphify, open the graph, read its report, download it, serve it over MCP, delete it) and the Obsidian vault made from a graph (build, read the notes in the browser, open the map, download), with the `/graph/…` and `/obsidian/…` pages.
 
 ## Use it
 

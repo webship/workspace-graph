@@ -11,7 +11,7 @@ source ${WORKSPACE_SCRIPTS}/bootstrap.sh || exit 1 ;
 eval $(parse_yaml ${WORKSPACE_CONFIG}/workspace.graphs.settings.yml);
 
 ARGPARSE_DESCRIPTION="Work with the project knowledge graphs kept in ~/workspace/graphs/"
-source ${WORKSPACE_SCRIPTS}/args/arg-graphs.sh || exit 1 ;
+source ${WORKSPACE_SCRIPTS}/plugins/graph/args/arg-graphs.sh || exit 1 ;
 
 shift $#;
 

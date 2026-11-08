@@ -1,7 +1,7 @@
 {
   "name": "@webship.co/workspace-graph",
-  "version": "1.0.0-alpha1",
-  "description": "The Graphs workspace for Webship Workspace: the `graphs/` folder (type code), its settings file, its 1 commands and its docs, activated as a plugin.",
+  "version": "1.0.0-alpha2",
+  "description": "The knowledge graphs for Webship Workspace: the graphs/ workspace as a plugin, the Graph menu on every project row (build with graphify, open, report, download, MCP, delete) and the Obsidian vault made from a graph (build, read, map, download), with the /graph and /obsidian pages.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "license": "ISC",
@@ -10,12 +10,13 @@
     "url": "https://github.com/webship/workspace-graph.git"
   },
   "files": [
-    "dist/src",
+    "README.md",
     "commands",
     "config",
+    "dist/src",
     "docs",
     "features",
-    "README.md"
+    "scripts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -40,11 +41,39 @@
     },
     "features": [
       "features/graph.feature"
-    ]
+    ],
+    "typeActions": {
+      "graphify": [
+        "sites",
+        "code"
+      ]
+    },
+    "commands": {
+      "types": [
+        "sites",
+        "code"
+      ],
+      "files": [
+        "commands/cmd-tools-graphify.sh",
+        "commands/cmd-tools-obsidian.sh"
+      ]
+    },
+    "scripts": {
+      "functions": [
+        "scripts/functions/fun-graphify.sh",
+        "scripts/functions/fun-graphs.sh",
+        "scripts/functions/fun-obsidian.sh"
+      ],
+      "args": [
+        "scripts/args/arg-graphify.sh",
+        "scripts/args/arg-graphs.sh",
+        "scripts/args/arg-obsidian.sh"
+      ]
+    }
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@webship.co/workspace-plugin-api": "^1.0.0-alpha1",
+    "@webship.co/workspace-plugin-api": "github:webship/workspace-plugin-api#1.0.x",
     "typescript": "^5.9.0"
   },
   "publishConfig": {
