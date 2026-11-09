@@ -98,3 +98,33 @@ test('register() owns the graphs page, draws the Graph menu where graphify is al
   graphPage.fn({ res: res2, match: ['', 'dev', 'nope', undefined] });
   assert.strictEqual(code, 404);
 });
+
+test('on a dashboard that fetches menu bodies, the Graph row carries the button and the caption, and the fragment serves the body behind the same gates', () => {
+  const root = tree();
+  process.env.WORKSPACE_ROOT = root;
+  delete require.cache[require.resolve('../src/lib/graphs')]; delete require.cache[require.resolve('../src/lib/obsidian')]; delete require.cache[require.resolve('../src/index')];
+  const { register } = require('../src/index');
+  const { api, calls } = fakeApi(root);
+  api.capabilities = new Set(['row-menu-body']);
+  api.lib.typeAllows = (ws: string, action: string) => ws === 'dev' && action === 'graphify';
+  register(api);
+  const ctx = (allowed: string[]) => ({ key: 'dev', project: 'site1', dir: path.join(root, 'dev'), meta: {}, allowed: new Set(allowed), vals: () => '' });
+  const menu = calls.rowMenus.graph.fn(ctx(['graphify']));
+  assert.strictEqual(menu.body, '/fragments/p/graph/menu/dev/site1');
+  assert.strictEqual(menu.caption, 'built');
+  assert.match(menu.html, /> Graph </);
+  assert.doesNotMatch(menu.html, /uk-dropdown|hx-post/, 'the page carries the button alone');
+  assert.strictEqual(calls.rowMenus.graph.fn(ctx([])), null, 'the gate on the row is unchanged');
+  let out = { html: '', status: 200 };
+  const send = (html: string, status = 200) => { out = { html, status }; };
+  calls.fragments[0]({ send, rest: 'menu/dev/site1' });
+  assert.strictEqual(out.status, 200);
+  assert.match(out.html, /^<ul class="uk-nav uk-dropdown-nav">/);
+  assert.match(out.html, /Rebuild the graph/);
+  assert.match(out.html, /\/actions\/p\/graph\/obsidian"/);
+  assert.match(out.html, /hx-vals='\{"workspace":"dev","projectName":"site1"\}' hx-target="#webship-workspace-output"/);
+  calls.fragments[0]({ send, rest: 'menu/graphs/site1' });
+  assert.strictEqual(out.status, 404, 'a workspace whose type does not allow graphify has no menu body');
+  calls.fragments[0]({ send, rest: 'menu/dev/site1/extra' });
+  assert.strictEqual(out.status, 404);
+});

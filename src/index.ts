@@ -22,7 +22,7 @@ export { graphs, obsidian };
 
 export function register(api: PluginApi): void {
   const lib = api.lib as any;
-  const { esc, workspaceDir, listProjects, isValidWorkspace, NAME_RE, ROOT, iconHtml, humanSize, humanTime, commandBlock, runningJobKey, startJob, jobFragment, startInScreen, screenStartedHtml, findScript, cssVersionNow, lists } = lib;
+  const { esc, workspaceDir, listProjects, isValidWorkspace, NAME_RE, ROOT, iconHtml, humanSize, humanTime, commandBlock, runningJobKey, startJob, jobFragment, startInScreen, screenStartedHtml, findScript, cssVersionNow, lists, typeAllows } = lib;
   const { graphStoreDir, hasGraph, listGraphs } = graphs;
   const { vaultDir, indexNote, vaultView, vaultCanvas, vaultFrame, obsidianMenuItems } = obsidian;
   const post = (name: string) => `/actions/p/${api.name}/${name}`;
@@ -89,20 +89,31 @@ export function register(api: PluginApi): void {
   });
 
   api.addFragment(({ req, send, rest }: any) => {
-    if (rest !== 'list') return send('', 404);
-    return send(graphRowsHtml(lists.readPageState(req)));
+    if (rest === 'list') return send(graphRowsHtml(lists.readPageState(req)));
+    // The Graph menu's body, asked for as the menu opens (see the row menu below): the same gates as
+    // the row's, read for this one project.
+    const m = /^menu\/([a-z0-9_-]+)\/([a-zA-Z0-9_-]+)$/.exec(rest);
+    if (m && isValidWorkspace(m[1]) && NAME_RE.test(m[2]) && typeAllows(m[1], 'graphify') && findGraphifyScript(workspaceDir(m[1]))) return send(graphMenuBody(m[1], m[2]));
+    return send('<ul class="uk-nav uk-dropdown-nav"><li class="uk-nav-header">No such menu.</li></ul>', 404);
   });
 
   // ---- The Graph menu on a project row ---------------------------------------------------------
 
-  api.addRowMenu('graph', { label: 'Graph', row: 1 }, ({ key, project: p, dir, allowed, vals }: RowContext) => {
-    if (!allowed.has('graphify') || !findGraphifyScript(dir)) return null;
-    const built = hasGraph(key, p, 'graph.json') || hasGraph(key, p, 'graph.html');
+  const fragment = (rest: string) => `/fragments/p/${api.name}/${rest}`;
+  // A dashboard since 1.0.0-rc2 fetches a row menu's body when the menu opens (`row-menu-body`): the
+  // page carries the button and the caption, and graphMenuBody() answers from the fragment above for
+  // that one project. An older dashboard gets the whole menu inline, as it always did.
+  const lazy = !!(api.capabilities && api.capabilities.has('row-menu-body'));
+  const graphButton = '<button class="uk-button uk-button-default uk-button-small" type="button" title="Knowledge graph"><span uk-icon="icon: git-fork; ratio: .7"></span> Graph <span uk-icon="icon: chevron-down; ratio: .6"></span></button>';
+  const rowVals = (key: string, p: string) => (extra = '') => `hx-vals='{"workspace":"${esc(key)}","projectName":"${esc(p)}"${extra}}' hx-target="#webship-workspace-output" hx-swap="innerHTML"`;
+  const isBuilt = (key: string, p: string) => hasGraph(key, p, 'graph.json') || hasGraph(key, p, 'graph.html');
+
+  /** The dropdown's inner HTML for one project: build or rebuild, and what a built graph offers. */
+  function graphMenuBody(key: string, p: string, vals: (extra?: string) => string = rowVals(key, p)): string {
+    const built = isBuilt(key, p);
     const busy = !!runningJobKey(`graphify:${key}/${p}`);
     const items = obsidianMenuItems(key, p, vals, busy, post);
-    return `<span class="act-with-status"><div class="uk-inline act-menu act-menu-graph">
-      <button class="uk-button uk-button-default uk-button-small" type="button" title="Knowledge graph"><span uk-icon="icon: git-fork; ratio: .7"></span> Graph <span uk-icon="icon: chevron-down; ratio: .6"></span></button>
-      <div uk-dropdown="mode: click; pos: bottom-right"><ul class="uk-nav uk-dropdown-nav">
+    return `<ul class="uk-nav uk-dropdown-nav">
         <li data-entry="build the graph"><a href hx-post="${post('graphify')}" ${vals()} class="${busy ? 'uk-disabled' : ''}"><span uk-icon="icon: play; ratio: .7"></span> ${built ? 'Rebuild the graph' : 'Build the graph'}${busy ? ' (running…)' : ''}</a></li>
         ${built ? `<li class="uk-nav-divider"></li>
         ${hasGraph(key, p, 'graph.html') ? `<li><a href="/graph/${esc(key)}/${esc(p)}" target="_blank" title="Loads vis-network from unpkg.com, so it needs internet"><span uk-icon="icon: image; ratio: .7"></span> Open the graph</a></li>` : ''}
@@ -112,8 +123,17 @@ export function register(api: PluginApi): void {
         ${items}
         <li class="uk-nav-divider"></li>
         <li><a href class="uk-text-danger arm-step" hx-post="${post('graph-remove')}" ${vals(',"confirm":"yes"')} hx-trigger="confirmed-remove"><span uk-icon="icon: trash; ratio: .7"></span> Delete the graph</a></li>` : ''}
-      </ul></div>
-    </div><span class="act-status uk-text-meta">${built ? 'built' : 'none'}</span></span>`;
+      </ul>`;
+  }
+
+  api.addRowMenu('graph', { label: 'Graph', row: 1 }, ({ key, project: p, dir, allowed, vals }: RowContext) => {
+    if (!allowed.has('graphify') || !findGraphifyScript(dir)) return null;
+    const caption = isBuilt(key, p) ? 'built' : 'none';
+    if (lazy) return { html: graphButton, body: fragment(`menu/${encodeURIComponent(key)}/${encodeURIComponent(p)}`), caption };
+    return `<span class="act-with-status"><div class="uk-inline act-menu act-menu-graph">
+      ${graphButton}
+      <div uk-dropdown="mode: click; pos: bottom-right">${graphMenuBody(key, p, vals)}</div>
+    </div><span class="act-status uk-text-meta">${caption}</span></span>`;
   });
 
   // ---- Actions ----------------------------------------------------------------------------------
