@@ -1,6 +1,6 @@
 {
   "name": "@webship.co/workspace-graph",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0",
   "description": "The knowledge graphs for Webship Workspace: the graphs/ workspace as a plugin, the Graph menu on every project row (build with graphify, open, report, download, MCP, delete) and the Obsidian vault made from a graph (build, read, map, download), with the /graph and /obsidian pages.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@webship.co/workspace-plugin-api": "^1.0.0-rc1",
+    "@webship.co/workspace-plugin-api": "^1.0.0",
     "typescript": "^5.9.0"
   },
   "publishConfig": {
