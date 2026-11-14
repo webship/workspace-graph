@@ -27,22 +27,39 @@
   "workspacePlugin": {
     "name": "graph",
     "label": "Graphs",
-    "suggests": [
-      [
-        "dev",
-        "test",
-        "sandboxes",
-        "demos",
-        "projects",
-        "products",
-        "drupal-modules",
-        "drupal-themes",
-        "drupal-recipes",
-        "drupal-profiles",
-        "drupal-site-templates",
-        "libraries"
+    "needs": {
+      "commands": [
+        "python3"
       ]
-    ],
+    },
+    "suggests": {
+      "plugins": [
+        [
+          "dev",
+          "test",
+          "sandboxes",
+          "demos",
+          "projects",
+          "products",
+          "drupal-modules",
+          "drupal-themes",
+          "drupal-recipes",
+          "drupal-profiles",
+          "drupal-site-templates",
+          "libraries"
+        ]
+      ],
+      "commands": [
+        {
+          "command": "graphify",
+          "hint": "cmd-tools-graphify.sh installs it for you with uv or pipx when it is missing"
+        },
+        [
+          "uv",
+          "pipx"
+        ]
+      ]
+    },
     "workspace": {
       "key": "graphs",
       "settingsTemplate": "config/workspace.graphs.settings.yml",
