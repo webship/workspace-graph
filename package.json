@@ -27,6 +27,22 @@
   "workspacePlugin": {
     "name": "graph",
     "label": "Graphs",
+    "suggests": [
+      [
+        "dev",
+        "test",
+        "sandboxes",
+        "demos",
+        "projects",
+        "products",
+        "drupal-modules",
+        "drupal-themes",
+        "drupal-recipes",
+        "drupal-profiles",
+        "drupal-site-templates",
+        "libraries"
+      ]
+    ],
     "workspace": {
       "key": "graphs",
       "settingsTemplate": "config/workspace.graphs.settings.yml",
