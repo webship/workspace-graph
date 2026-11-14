@@ -16,9 +16,11 @@ bash core/scripts/plugins.sh --install graph      # the folder, its settings fil
 The settings file and the docs are placed once and never overwritten: they hold what you put there.
 `--deactivate` takes the workspace off the list; the folder and its content stay.
 
-## What it goes with
+## What it needs
 
 A graph is made of a project, and `cmd-tools-graphify.sh` and `cmd-tools-obsidian.sh` are placed in every folder of sites or code. On a workspace that has no such folder they land only in `graphs/` itself and the Graph menu has no row to be on, so the manifest suggests one (`suggests`: `dev`, `test`, `sandboxes`, `demos`, `projects`, `products`, `drupal-modules`, `drupal-themes`, `drupal-recipes`, `drupal-profiles`, `drupal-site-templates`, `libraries`): `--require` and `--list` say whether the workspace has one, and nothing is added for you. A folder added later gets the two commands when it is installed.
+
+On the machine it needs `python3`; a part of it uses `graphify` (which `cmd-tools-graphify.sh` installs for you, with `uv` or `pipx`, when it is missing). `bash core/scripts/plugins.sh --check graph` says which are there.
 
 ## The commands
 
