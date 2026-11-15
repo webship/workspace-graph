@@ -1,7 +1,7 @@
 {
   "name": "@webship.co/workspace-graph",
   "version": "1.0.8",
-  "description": "The knowledge graphs for Webship Workspace: the graphs/ workspace as a plugin, the Graph menu on every project row (build with graphify, open, report, download, MCP, delete) and the Obsidian vault made from a graph (build, read, map, download), with the /graph and /obsidian pages.",
+  "description": "The knowledge graphs for Webship Workspace: the graphs/ workspace as a plugin, the Graph menu on every project row (build with graphify, open, report, download, MCP, delete) and the Obsidian vault made from a graph (build, read, map, download), with the /graph and /obsidian pages; with its AI items (an agent, a skill, a command and a prompt), each placed in the folder of its kind.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "license": "ISC",
@@ -11,6 +11,7 @@
   },
   "files": [
     "README.md",
+    "ai",
     "commands",
     "config",
     "dist/src",
@@ -28,6 +29,12 @@
     "name": "graph",
     "label": "Graphs",
     "needs": {
+      "plugins": [
+        "ai-agents",
+        "ai-skills",
+        "ai-commands",
+        "ai-prompts"
+      ],
       "commands": [
         "python3"
       ]
@@ -70,6 +77,20 @@
         "docs/AGENTS.md",
         "docs/CLAUDE.md",
         "docs/README.md"
+      ]
+    },
+    "ai": {
+      "agents": [
+        "ai/agents/graphs-mapper.md"
+      ],
+      "skills": [
+        "ai/skills/graphs-workflow"
+      ],
+      "commands": [
+        "ai/commands/graphs-query.md"
+      ],
+      "prompts": [
+        "ai/prompts/graphs-map-a-project.md"
       ]
     },
     "features": [

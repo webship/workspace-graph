@@ -13,7 +13,8 @@ const manifest = JSON.parse(fs.readFileSync(path.join(PKG, 'package.json'), 'utf
 const walk = (dir: string): string[] => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]));
 
 test("the manifest says what the plugin needs: the plugins and the commands it cannot work without, and what a part of it uses", () => {
-  assert.deepStrictEqual(manifest.needs, {'commands': ['python3']});
+  assert.deepStrictEqual(manifest.needs, {'plugins': ['ai-agents', 'ai-skills', 'ai-commands', 'ai-prompts'], 'commands': ['python3']});
+  for (const [kind, folder] of Object.entries({ agents: 'ai-agents', skills: 'ai-skills', commands: 'ai-commands', prompts: 'ai-prompts' })) assert.ok(manifest.ai[kind].length > 0 && manifest.needs.plugins.includes(folder), `it ships ${kind}, which is why it needs ${folder}`);
   assert.deepStrictEqual(manifest.suggests, {'plugins': [['dev', 'test', 'sandboxes', 'demos', 'projects', 'products', 'drupal-modules', 'drupal-themes', 'drupal-recipes', 'drupal-profiles', 'drupal-site-templates', 'libraries']], 'commands': [{'command': 'graphify', 'hint': 'cmd-tools-graphify.sh installs it for you with uv or pipx when it is missing'}, ['uv', 'pipx']]});
   const sources = ['commands', 'scripts', 'src'].flatMap((d) => (fs.existsSync(path.join(PKG, d)) ? walk(path.join(PKG, d)) : [])).map((f) => fs.readFileSync(f, 'utf8')).join('\n');
   for (const command of ['python3', 'graphify', 'uv', 'pipx']) assert.match(sources, new RegExp(`(^|[^A-Za-z0-9_-])${command}([^A-Za-z0-9_-]|$)`, 'm'), `${command} is called by the plugin`);
