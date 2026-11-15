@@ -18,6 +18,12 @@ const graphs = require('./lib/graphs');
 const obsidian = require('./lib/obsidian');
 
 export const WORKSPACE_KEY = 'graphs';
+
+/** The AI items the installer places, each in the workspace folder of its kind (ai/ in this package). */
+export const AGENTS = ['graphs-mapper'];
+export const SKILLS = ['graphs-workflow'];
+export const AI_COMMANDS = ['graphs-query'];
+export const PROMPTS = ['graphs-map-a-project'];
 export { graphs, obsidian };
 
 export function register(api: PluginApi): void {
@@ -271,5 +277,5 @@ export function register(api: PluginApi): void {
     return fs.createReadStream(real).pipe(res);
   });
 
-  api.addAssistantContext(() => 'The graphs/ workspace holds one knowledge graph per project (built by cmd-tools-graphify.sh, @webship.co/workspace-graph); the Graph menu on a project row builds, opens, downloads, serves over MCP or deletes it, and makes an Obsidian vault from it.');
+  api.addAssistantContext(() => 'The graphs/ workspace holds one knowledge graph per project (built by cmd-tools-graphify.sh, @webship.co/workspace-graph); the Graph menu on a project row builds, opens, downloads, serves over MCP or deletes it, and makes an Obsidian vault from it. It comes with AI items for this work: the agent `graphs-mapper` (ai-agents/), the skill `graphs-workflow` (ai-skills/), the command `/graphs-query` (ai-commands/) and the prompt `graphs-map-a-project` (ai-prompts/).');
 }

@@ -27,3 +27,13 @@ bash cmd-tools-graphs.sh                              # Graphs (list, collect, s
 
 Every one locates the workspace from its own path, so there is nothing to export and nothing to
 install. `--help` on any of them lists its arguments.
+
+## AI items for this folder
+
+The plugin of this folder (`@webship.co/workspace-graph`) places its own AI items in the AI folders of the
+workspace, when they are active:
+
+- `graphs-mapper` (`ai-agents/`): Maps a project into a knowledge graph from its own folder, answers questions from it, keeps `graphs/` in order, makes a vault of a graph; never sends file contents to a model unasked
+- `graphs-workflow` (`ai-skills/`): How work is done with the graphs: build from the project's folder, read the report, ask, check against the file; the three commands with their flags, the settings keys
+- `/graphs-query` (`ai-commands/`): `/graphs-query <workspace>/<project> <question>`: checks the graph is there, asks it without rebuilding and says which file has the final word
+- `graphs-map-a-project` (`ai-prompts/`): A new session that maps a project into a knowledge graph and says what it is made of
