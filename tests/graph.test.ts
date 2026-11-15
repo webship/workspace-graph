@@ -16,7 +16,7 @@ function fakeApi(root: string) {
       isValidWorkspace: (ws: string) => ['dev', 'graphs'].includes(ws), NAME_RE: /^[a-zA-Z0-9_-]+$/,
       iconHtml: (n: string) => `<i data-icon="${n}"></i>`, humanSize: (n: number) => `${n} B`, humanTime: (d: Date) => String(d),
       commandBlock: (t: string, lines: string[]) => `<pre>${t}\n${lines.join('\n')}</pre>`, runningJobKey: () => null,
-      startJob: () => 'job-1', jobFragment: () => ({ html: 'job-html' }), startInScreen: async (o: any) => { calls.screen = o; return { ok: true }; }, screenStartedHtml: () => 'started',
+      startInScreen: async (o: any) => { calls.screen = o; return { ok: true }; }, screenStartedHtml: () => 'started',
       findScript: (dir: string, patterns: RegExp[]) => { try { return fs.readdirSync(dir).find((f) => patterns.some((p) => p.test(f))) || null; } catch (_) { return null; } },
       cssVersionNow: () => 'v1',
       lists: { SORTS: { newest: { cmp: (a: any, b: any) => b.mtime - a.mtime } }, defaultSort: () => 'newest', paginate: (l: any[], st: any) => ({ slice: l, page: 1, pages: 1, total: l.length }), listControlsHtml: () => '<controls>', listPagerHtml: () => '<pager>', readPageState: () => ({ q: '', sort: 'newest' }) },
@@ -86,6 +86,14 @@ test('register() owns the graphs page, draws the Graph menu where graphify is al
   await calls.actions.graphify({ form: { projectName: 'site1' }, send: (h: string) => { out = h; }, workspace: 'dev' });
   assert.strictEqual(out, 'started');
   assert.match(calls.screen.cmdLine, /cmd-tools-graphify\.sh" "site1"/);
+  // The vault is built in a screen session too: no job of the page, so no terminal is drawn in it.
+  fs.writeFileSync(path.join(root, 'dev', 'cmd-tools-obsidian.sh'), '#!/usr/bin/env bash\n');
+  out = '';
+  await calls.actions.obsidian({ form: { projectName: 'site1' }, send: (h: string) => { out = h; }, workspace: 'dev' });
+  assert.strictEqual(out, 'started');
+  assert.strictEqual(calls.screen.verb, 'obsidian');
+  assert.match(calls.screen.cmdLine, /^bash "cmd-tools-obsidian\.sh" "site1"/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', '..', 'src', 'index.ts'), 'utf8'), /startJob|jobFragment/);
   await calls.actions['graph-mcp-command']({ form: { projectName: 'site1' }, send: (h: string) => { out = h; }, workspace: 'dev' });
   assert.match(out, /graphify-mcp/);
   const page = calls.pages.find((p: any) => p.re.test('/obsidian/dev/site1/view'));

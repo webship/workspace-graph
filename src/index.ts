@@ -28,7 +28,7 @@ export { graphs, obsidian };
 
 export function register(api: PluginApi): void {
   const lib = api.lib as any;
-  const { esc, workspaceDir, listProjects, isValidWorkspace, NAME_RE, ROOT, iconHtml, humanSize, humanTime, commandBlock, runningJobKey, startJob, jobFragment, startInScreen, screenStartedHtml, findScript, cssVersionNow, lists, typeAllows } = lib;
+  const { esc, workspaceDir, listProjects, isValidWorkspace, NAME_RE, ROOT, iconHtml, humanSize, humanTime, commandBlock, runningJobKey, startInScreen, screenStartedHtml, findScript, cssVersionNow, lists, typeAllows } = lib;
   const { graphStoreDir, hasGraph, listGraphs } = graphs;
   const { vaultDir, indexNote, vaultView, vaultCanvas, vaultFrame, obsidianMenuItems } = obsidian;
   const post = (name: string) => `/actions/p/${api.name}/${name}`;
@@ -188,18 +188,20 @@ export function register(api: PluginApi): void {
     return send(`<div class="msg assistant">🗑️ Deleted the graph for <strong>${esc(projectName)}</strong>. Rebuild it any time from the Graph menu.</div>`);
   });
 
-  api.addAction('obsidian', ({ form, send, workspace }: ActionContext) => {
+  api.addAction('obsidian', async ({ form, send, workspace }: ActionContext) => {
     const dir = workspaceDir(workspace);
     const script = 'cmd-tools-obsidian.sh';
     const projectName = String(form.projectName || '');
     if (!fs.existsSync(path.join(dir, script))) return send('<div class="msg error">This workspace has no Obsidian script.</div>', 400);
     if (!NAME_RE.test(projectName) || !listProjects(dir).includes(projectName)) return send('<div class="msg error">Unknown project.</div>', 400);
     if (!fs.existsSync(path.join(graphStoreDir(workspace, projectName), 'graph.json'))) return send('<div class="msg error">No graph to convert yet — build the graph first, from the same menu.</div>', 409);
-    const jobKey = `obsidian:${workspace}/${projectName}`;
-    if (runningJobKey(jobKey)) return send('<div class="msg error">A vault is already being built for this project.</div>', 409);
-    const id = startJob(`🗂️ Obsidian <strong>${esc(projectName)}</strong>`, 'bash', [script, projectName], dir,
-      { timeoutMs: 10 * 60 * 1000, echoLine: `bash ${script} ${projectName}`, key: jobKey });
-    return send(jobFragment(id).html);
+    // A screen session like every other command (Graphify above): nothing is drawn as a terminal in the
+    // page. The session's name is the lock: a second press while it runs answers "already running". It
+    // ends by waiting to be read, since a vault is built in seconds.
+    const linger = typeof lib.lingerTail === 'function' ? `; ${lib.lingerTail('obsidian')}` : '';
+    const started = await startInScreen({ workspace, project: projectName, projectDir: dir, ownerDir: path.join(dir, projectName), verb: 'obsidian',
+      cmdLine: `bash ${JSON.stringify(script)} ${JSON.stringify(projectName)}${linger}`, label: 'obsidian' });
+    return send(screenStartedHtml(started, 'obsidian', projectName), started.ok ? 200 : (started.already ? 409 : 500));
   });
 
   api.addAction('obsidian-remove', ({ form, send, workspace }: ActionContext) => {
