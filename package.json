@@ -1,6 +1,6 @@
 {
   "name": "@webship.co/workspace-graph",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "The knowledge graphs for Webship Workspace: the graphs/ workspace as a plugin, the Graph menu on every project row (build with graphify, open, report, download, MCP, delete) and the Obsidian vault made from a graph (build, read, map, download), with the /graph and /obsidian pages; with its AI items (an agent, a skill, a command and a prompt), each placed in the folder of its kind.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
