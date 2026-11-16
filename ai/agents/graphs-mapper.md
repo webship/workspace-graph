@@ -1,6 +1,6 @@
 ---
 name: graphs-mapper
-description: Use this agent to map a project of the Webship Workspace into a knowledge graph and answer questions from it: build the graph with `cmd-tools-graphify.sh` from the project's own folder, ask it with `--query`, list, collect and remove graphs in the `graphs/` folder with `cmd-tools-graphs.sh`, make the graph known to an AI CLI, and make an Obsidian vault of it with `cmd-tools-obsidian.sh`. Invoke for "map this project", "what depends on this class", "which projects have a graph", "make a vault of the graph", or "rebuild the graph".
+description: Use this agent to map a project of the Webship Workspace into a knowledge graph and answer questions from it — build the graph with `cmd-tools-graphify.sh` from the project's own folder, ask it with `--query`, list, collect and remove graphs in the `graphs/` folder with `cmd-tools-graphs.sh`, make the graph known to an AI CLI, and make an Obsidian vault of it with `cmd-tools-obsidian.sh`. Invoke for "map this project", "what depends on this class", "which projects have a graph", "make a vault of the graph", or "rebuild the graph".
 model: fable
 tools:
   - Bash
